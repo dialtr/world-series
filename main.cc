@@ -2,8 +2,8 @@
 #include <stdexcept>
 
 using ::std::cout;
-using ::std::endl;
 using ::std::domain_error;
+using ::std::endl;
 
 // How many games are we simulating, potentially?
 const int GAMES_IN_SERIES = 7;
@@ -99,8 +99,18 @@ void RunStats(Node* root) {
   cout << "P(underdog): " << p_under << endl;
 }
 
+void FreeTree(Node* p) {
+  if (!p) {
+    return;
+  }
+  FreeTree(p->favorite_win);
+  FreeTree(p->underdog_win);
+  delete p;
+}
+
 int main(int argc, char* argv[]) {
   Node* node = BuildTree(GAMES_IN_SERIES, P_FAVORITE_WINNING);
   RunStats(node);
+  FreeTree(node);
   return 0;
 }
