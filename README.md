@@ -29,3 +29,7 @@ In such an implementation, I believe the algorithm could be something like:
 
 (Need to think about this more.)
 
+## TODO
+
+* Parameterize the program to accept user input
+* Consider stack-based implementation for v2, described roughly above.
