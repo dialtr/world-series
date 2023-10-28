@@ -1,9 +1,11 @@
 #include <iostream>
+#include <stack>
 #include <stdexcept>
 
 using ::std::cout;
 using ::std::domain_error;
 using ::std::endl;
+using ::std::stack;
 
 // How many games are we simulating, potentially?
 const int GAMES_IN_SERIES = 7;
@@ -99,6 +101,47 @@ void RunStats(Node* root) {
   cout << "P(underdog): " << p_under << endl;
 }
 
+void Debug(Node* node) {
+  if (node == nullptr) {
+    return;
+  }
+  if (node->series_winner != Team::None) {
+    // Walk backwards through decision tree to find winners, pushing
+    // the elements to a stack so that we can pop them in "series play
+    // order".
+    Node* p = node;
+    stack<Node*> series;
+    while (p->parent) {
+      series.push(p);
+      p = p->parent;
+    }
+
+    // Print the probability of this outcome.
+    cout << "P(outcome) " << node->outcome_probability << " [ ";
+
+    // Print the games played in the series.
+    while (series.size()) {
+      Node* p = series.top();
+      series.pop();
+      switch (p->game_winner) {
+        case Team::Favorite:
+          cout << "F ";
+          break;
+        case Team::Underdog:
+          cout << "U ";
+          break;
+        default:
+          // Intentionally do not print the root element
+          break;
+      }
+    }
+    cout << "]" << endl;
+    return;
+  }
+  Debug(node->favorite_win);
+  Debug(node->underdog_win);
+}
+
 void FreeTree(Node* p) {
   if (!p) {
     return;
@@ -110,6 +153,8 @@ void FreeTree(Node* p) {
 
 int main(int argc, char* argv[]) {
   Node* node = BuildTree(GAMES_IN_SERIES, P_FAVORITE_WINNING);
+  Debug(node);
+  cout << "-" << endl;
   RunStats(node);
   FreeTree(node);
   return 0;
