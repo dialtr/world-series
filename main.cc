@@ -6,10 +6,13 @@ using ::std::endl;
 // How many games are we simulating, potentially?
 const int GAMES_IN_SERIES = 7;
 
+// What is the probability of the favorite winning a single game?
 const double P_FAVORITE_WINNING = 0.55f;
 
+// Enumeration representing the team.
 enum class Team : int { None, Favorite, Underdog };
 
+// Node represents the state of a particular outcome in the decision tree.
 class Node {
  public:
   Node* parent = nullptr;
@@ -22,6 +25,7 @@ class Node {
   int underdog_victories = 0;
 };
 
+// Build the edecision tree (recursive helper).
 void BuildTree(Node* parent, int wins_needed, double p_fave) {
   // If there was a series winner, stop recursing.
 
@@ -56,13 +60,15 @@ void BuildTree(Node* parent, int wins_needed, double p_fave) {
   BuildTree(under, wins_needed, p_fave);
 }
 
+// Build the decision tree.
 Node* BuildTree(int games_in_series, double p_of_favorite_victory) {
   Node* root = new Node();
   BuildTree(root, (games_in_series + 1) / 2, p_of_favorite_victory);
   return root;
 }
 
-void StatsRecurse(Node* node, double* p_fave, double* p_under) {
+// Run stats (recursive helper)
+void RunStatsRecurse(Node* node, double* p_fave, double* p_under) {
   if (!node) {
     return;
   }
@@ -79,20 +85,20 @@ void StatsRecurse(Node* node, double* p_fave, double* p_under) {
       break;
   }
 
-  StatsRecurse(node->favorite_win, p_fave, p_under);
-  StatsRecurse(node->underdog_win, p_fave, p_under);
+  RunStatsRecurse(node->favorite_win, p_fave, p_under);
+  RunStatsRecurse(node->underdog_win, p_fave, p_under);
 }
 
-void Stats(Node* root) {
+void RunStats(Node* root) {
   double p_fave = 0.0f;
   double p_under = 0.0f;
-  StatsRecurse(root, &p_fave, &p_under);
+  RunStatsRecurse(root, &p_fave, &p_under);
   cout << "P(favorite): " << p_fave << endl;
   cout << "P(underdog): " << p_under << endl;
 }
 
 int main(int argc, char* argv[]) {
   Node* node = BuildTree(GAMES_IN_SERIES, P_FAVORITE_WINNING);
-  Stats(node);
+  RunStats(node);
   return 0;
 }
