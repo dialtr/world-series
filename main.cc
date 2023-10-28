@@ -1,7 +1,9 @@
 #include <iostream>
+#include <stdexcept>
 
 using ::std::cout;
 using ::std::endl;
+using ::std::domain_error;
 
 // How many games are we simulating, potentially?
 const int GAMES_IN_SERIES = 7;
