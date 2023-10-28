@@ -1,7 +1,12 @@
 #include <iostream>
 
+using ::std::cout;
+using ::std::endl;
+
 // How many games are we simulating, potentially?
 const int GAMES_IN_SERIES = 7;
+
+const double P_FAVORITE_WINNING = 0.55f;
 
 enum class Team : int { None, Favorite, Underdog };
 
@@ -57,10 +62,37 @@ Node* BuildTree(int games_in_series, double p_of_favorite_victory) {
   return root;
 }
 
-void Stats(Node* root) {}
+void StatsRecurse(Node* node, double* p_fave, double* p_under) {
+  if (!node) {
+    return;
+  }
+
+  switch (node->series_winner) {
+    case Team::Favorite:
+      (*p_fave) += node->outcome_probability;
+      return;
+    case Team::Underdog:
+      (*p_under) += node->outcome_probability;
+      return;
+    default:
+      // Intentionally empty.
+      break;
+  }
+
+  StatsRecurse(node->favorite_win, p_fave, p_under);
+  StatsRecurse(node->underdog_win, p_fave, p_under);
+}
+
+void Stats(Node* root) {
+  double p_fave = 0.0f;
+  double p_under = 0.0f;
+  StatsRecurse(root, &p_fave, &p_under);
+  cout << "P(favorite): " << p_fave << endl;
+  cout << "P(underdog): " << p_under << endl;
+}
 
 int main(int argc, char* argv[]) {
-  Node* node = BuildTree(GAMES_IN_SERIES, 0.60f);
+  Node* node = BuildTree(GAMES_IN_SERIES, P_FAVORITE_WINNING);
   Stats(node);
   return 0;
 }
